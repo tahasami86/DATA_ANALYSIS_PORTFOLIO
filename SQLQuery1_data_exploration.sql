@@ -1,3 +1,5 @@
+
+
 --select  location , date , total_cases , new_cases , total_deaths , new_deaths , population
 --SELECT *
 --from portfolio_project..CovidDeaths_csv
@@ -67,3 +69,11 @@ order by Percn_of_deaths desc
 SELECT MAX(total_deaths) as max_deaths ,  max(total_cases) AS total_cases , CAST(MAX(total_deaths) AS FLOAT) / CAST(MAX(total_cases) AS FLOAT) * 100 AS Percentage_of_deaths
 FROM portfolio_project..CovidDeaths_csv
 order by Percentage_of_deaths
+
+
+-- joining datest
+
+
+
+
+

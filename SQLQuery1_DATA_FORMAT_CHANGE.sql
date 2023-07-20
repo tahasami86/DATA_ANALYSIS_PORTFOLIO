@@ -100,6 +100,119 @@ FROM DATA_CLEANING_PROJECT..[Nashville Housing Data for Data Cleaning_CSV]
 
 /*
 
-SPLITING OWNER ADDRESS
+SPLITING OWNER ADDRESS into different Columns
 
 */
+
+SELECT  PARSENAME(REPLACE(OwnerAddress,',' , '.'),3),
+		PARSENAME(REPLACE(OwnerAddress,',' , '.'),2),
+		PARSENAME(REPLACE(OwnerAddress,',' , '.'),1)
+FROM [Nashville Housing Data for Data Cleaning_CSV]
+
+ALTER TABLE DATA_CLEANING_PROJECT..[Nashville Housing Data for Data Cleaning_CSV]
+ADD OWNER_ADDRESS_SPLIT NVARCHAR(255);
+
+UPDATE [Nashville Housing Data for Data Cleaning_CSV]
+SET
+OWNER_ADDRESS_SPLIT=PARSENAME(REPLACE(OwnerAddress,',' , '.'),3)
+
+ALTER TABLE DATA_CLEANING_PROJECT..[Nashville Housing Data for Data Cleaning_CSV]
+ADD OWNER_SPLIT_CITY NVARCHAR(255);
+
+UPDATE [Nashville Housing Data for Data Cleaning_CSV]
+SET OWNER_SPLIT_CITY=PARSENAME(REPLACE(OwnerAddress,',' , '.'),2)
+
+
+ALTER TABLE DATA_CLEANING_PROJECT..[Nashville Housing Data for Data Cleaning_CSV]
+ADD OWNER_SPLIT_STATE NVARCHAR(255);
+
+UPDATE [Nashville Housing Data for Data Cleaning_CSV]
+SET OWNER_SPLIT_STATE=PARSENAME(REPLACE(OwnerAddress,',' , '.'),1)
+
+
+SELECT *
+FROM [Nashville Housing Data for Data Cleaning_CSV]
+
+
+-------------------------------------------------------------------------------
+
+/*
+
+CHANGE VALUES 
+
+
+*/
+
+--------------------------------------------------------------------------------
+
+
+SELECT DISTINCT(SoldAsVacant_NEW),COUNT(SoldAsVacant)
+FROM [Nashville Housing Data for Data Cleaning_CSV]
+GROUP BY SoldAsVacant_NEW
+ORDER BY 1
+
+ALTER TABLE [Nashville Housing Data for Data Cleaning_CSV]
+ADD SoldAsVacant_NEW NVARCHAR(255)
+
+UPDATE [Nashville Housing Data for Data Cleaning_CSV]
+SET SoldAsVacant_New=cast(SoldAsVacant as nvarchar)
+
+
+UPDATE [Nashville Housing Data for Data Cleaning_CSV]
+SET SoldAsVacant_NEW=CASE
+                     WHEN SoldAsVacant_NEW = 1 THEN 'YES'
+                     WHEN SoldAsVacant_NEW = 0 THEN 'NO'
+                   END;
+				
+
+
+
+----------------------------------------------------------------------------------------
+
+/*
+
+REMOVE DUPLICATES
+
+
+*/
+
+---------------------------------------------------------------------------------------
+WITH ROWNUMCTE AS(				
+SELECT *,
+	ROW_NUMBER() OVER (
+	PARTITION BY ParcelID,
+				 PropertyAddress,
+				 SaleDate,
+				 LegalReference
+				 ORDER BY UniqueID
+				 ) row_num
+FROM [Nashville Housing Data for Data Cleaning_CSV]
+)
+
+SELECT *
+FROM ROWNUMCTE
+WHERE row_num > 1
+
+
+
+-------------------------------------------------------------------------
+
+/*
+
+Delet Columns
+
+*/
+
+
+----------------------------------------------------------------------------
+
+
+SELECT *
+FROM [Nashville Housing Data for Data Cleaning_CSV]
+
+ALTER TABLE [Nashville Housing Data for Data Cleaning_CSV]
+DROP COLUMN PropertyAddress, OwnerAddress
+
+
+
+
